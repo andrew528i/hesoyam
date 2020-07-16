@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "hesoyam",
+    "hesoyam_core",
+    "hesoyam_macro",
+    "examples/crud",
+]
