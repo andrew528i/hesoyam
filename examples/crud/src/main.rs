@@ -9,16 +9,17 @@ struct User {
 }
 
 fn main() {
-    println!("table name is: {:}", User::table_name());
-    println!("name field: {:#?}", User::field_name);
-    println!("fields are: {:#?}", User::fields());
+    // println!("table name is: {:}", User::table_name());
+    // println!("name field: {:#?}", User::field_name);
+    // println!("fields are: {:#?}", User::fields());
 
     // let qb = User::insert("John".to_owned(), 20);
     let users = vec![
         User { name: "John".to_owned(), age: 20 },
         User { name: "Tom".to_owned(), age: 30 },
     ];
-    let qb = users.insert_many();
+
+    let qb = users.save();
     let pg = PostgresDialect::new(qb);
     let res = pg.to_sql().unwrap();
 
