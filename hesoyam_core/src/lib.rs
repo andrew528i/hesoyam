@@ -1,5 +1,5 @@
 mod error;
-mod model;
+pub mod model;
 mod query_builder;
 
 pub use error::*;

@@ -5,6 +5,7 @@ use crate::context::ModelContext;
 
 pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
     let struct_ident = &ctx.struct_ident;
+    let dialect = &ctx.model_args.dialect;
     let struct_span = &ctx.struct_span;
     let field_ident = &ctx.field_ident;
     let struct_field_type = &ctx.struct_field_type;
@@ -17,7 +18,7 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
     let insert_many_ident = syn::Ident::new(&insert_many_ident, struct_span.clone());
 
     quote! {
-        trait #insert_one_ident {
+        pub trait #insert_one_ident {
             fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::QueryBuilder;
         }
 
@@ -30,13 +31,14 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
                 )*
 
                 hesoyam::QueryBuilder::insert(
+                    #dialect.to_owned(),
                     #struct_ident::table_name(),
                     #struct_ident::fields(),
                     vec![value])
             }
         }
 
-        trait #insert_many_ident {
+        pub trait #insert_many_ident {
             fn save(&self) -> hesoyam::QueryBuilder;
         }
 
@@ -55,6 +57,7 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
                 }
 
                 hesoyam::QueryBuilder::insert(
+                    #dialect.to_owned(),
                     #struct_ident::table_name(),
                     #struct_ident::fields(),
                     values)

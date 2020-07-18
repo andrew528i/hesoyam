@@ -1,11 +1,15 @@
 use crate::{Field, FieldType, InsertQueryBuilder, InsertValue, QueryBuilder, QueryBuilderType, Result};
 use crate::query_builder::Dialect;
 
-pub struct PostgresDialect {
-    query_builder: QueryBuilder,
+pub struct PostgresDialect<'a> {
+    query_builder: &'a QueryBuilder,
 }
 
-impl PostgresDialect {
+impl<'a> PostgresDialect<'a> {
+    pub fn new(query_builder: &'a QueryBuilder) -> Self {
+        Self { query_builder }
+    }
+
     fn insert_to_sql(&self, builder: &InsertQueryBuilder) -> Result<String> {
         let fields = self.insert_fields_to_sql(&builder.table_name, &builder.fields)?;
         let values = self.insert_values_to_sql(&builder.fields, &builder.values)?;
@@ -83,33 +87,11 @@ impl PostgresDialect {
     }
 }
 
-impl Dialect for PostgresDialect {
-    fn new(query_builder: QueryBuilder) -> Self {
-        Self { query_builder }
-    }
-
+impl<'a> Dialect for PostgresDialect<'a> {
     fn to_sql(&self) -> Result<String> {
         match &self.query_builder.builder_type {
             QueryBuilderType::Insert(builder) => self.insert_to_sql(builder),
             _ => unimplemented!(),
         }
     }
-
-    // fn insert_to_sql(query_builder: &InsertQueryBuilder) -> Result<String> {
-    //     let fields = Self::fields_to_sql(&query_builder.table_name, &query_builder.fields);
-    //     Ok(format!(
-    //         "insert into {table_name} {fields} values {values}",
-    //         table_name=query_builder.table_name,
-    //     ))
-    // }
-    //
-    // fn fields_to_sql(table_name: &String, fields: &Vec<Field>) -> Result<String> {
-    //     let field_names: Vec<String> = fields.iter().
-    //         map(|f| format!("`{}`.`{}`", table_name, f.name)).
-    //         collect();
-    //
-    //     let fields = format!("({})", field_names.join(","));
-    //
-    //     Ok(fields)
-    // }
 }

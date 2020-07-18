@@ -1,18 +1,15 @@
-use syn::{DataStruct, DeriveInput, Ident, AttributeArgs};
-use syn::export::{ToTokens, Span};
 use darling::FromMeta;
-
-use hesoyam_core::FieldType;
-
+use syn::{AttributeArgs, DataStruct, DeriveInput, Ident};
+use syn::export::{Span, ToTokens};
 use syn::spanned::Spanned;
 
-type ModelDialect = String;
+use hesoyam_core::{FieldType};
 
 #[derive(Debug, FromMeta)]
 pub(in crate) struct ModelArgs {
     #[darling(default)]
-    table_name: Option<String>,
-    dialect: ModelDialect,
+    pub table_name: Option<String>,
+    pub dialect: String,
 }
 
 pub(in crate) struct ModelContext {

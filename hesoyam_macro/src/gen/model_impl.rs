@@ -13,7 +13,7 @@ pub(in crate) fn gen_model_impl_code(ctx: &ModelContext) -> TokenStream2 {
         impl #struct_ident {
             #(
                 #[allow(non_upper_case_globals)]
-                const #field_ident: hesoyam::Field = hesoyam::Field {
+                pub const #field_ident: hesoyam::Field = hesoyam::Field {
                     name: #field_name,
                     field_type: #field_type,
                 };
