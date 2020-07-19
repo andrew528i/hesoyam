@@ -1,9 +1,9 @@
-use crate::{Field, InsertQueryBuilder, InsertValue, DeleteQueryBuilder, Condition, Result};
+use crate::{Field, InsertQueryBuilder, InsertValue, DeleteQueryBuilder, Condition, Result, UpdateQueryBuilder, UpdateField};
 
 pub enum QueryBuilderType<'a> {
     Insert(&'a InsertQueryBuilder),
     Select,
-    Update,
+    Update(&'a UpdateQueryBuilder),
     Delete(&'a DeleteQueryBuilder),
 }
 
@@ -31,12 +31,16 @@ impl QueryBuilder {
         DeleteQueryBuilder { dialect, table_name, conditions }
     }
 
-    // pub fn to_sql(&self) -> String {
-    //     let dialect = match self.dialect.as_str() {
-    //         "postgres" => PostgresDialect::new(self),
-    //         d => unimplemented!("{} dialect is not implemented yet", d),
-    //     };
-    //
-    //     dialect.to_sql().unwrap()
-    // }
+    pub fn update(
+        dialect: String,
+        table_name: String,
+        update_fields: Vec<UpdateField>,
+    ) -> UpdateQueryBuilder {
+        UpdateQueryBuilder {
+            dialect,
+            table_name,
+            update_fields,
+            filters: vec![],
+        }
+    }
 }

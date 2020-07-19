@@ -1,4 +1,4 @@
-use crate::{Field, FieldType, InsertQueryBuilder, InsertValue, QueryBuilderType, Result, DeleteQueryBuilder, Condition, Operator};
+use crate::{Field, FieldType, InsertQueryBuilder, InsertValue, QueryBuilderType, Result, DeleteQueryBuilder, Condition, Operator, UpdateQueryBuilder};
 use crate::query_builder::Dialect;
 
 pub struct PostgresDialect<'a> {
@@ -6,10 +6,6 @@ pub struct PostgresDialect<'a> {
 }
 
 impl<'a> PostgresDialect<'a> {
-    // pub fn new(query_builder: &'a QueryBuilderType) -> Self {
-    //     Self { query_builder }
-    // }
-
     pub fn from_insert_query_builder(builder: &'a InsertQueryBuilder) -> Self {
         Self {
             query_builder: QueryBuilderType::Insert(builder),
@@ -19,6 +15,12 @@ impl<'a> PostgresDialect<'a> {
     pub fn from_delete_query_builder(builder: &'a DeleteQueryBuilder) -> Self {
         Self {
             query_builder: QueryBuilderType::Delete(builder),
+        }
+    }
+
+    pub fn from_update_query_builder(builder: &'a UpdateQueryBuilder) -> Self {
+        Self {
+            query_builder: QueryBuilderType::Update(builder),
         }
     }
 
@@ -152,6 +154,24 @@ impl<'a> PostgresDialect<'a> {
         ))
     }
 
+    // update
+    fn update_to_sql(&self, builder: &UpdateQueryBuilder) -> Result<String> {
+        // let fields = self.insert_fields_to_sql(&builder.table_name, &builder.fields)?;
+        // let values = self.insert_values_to_sql(&builder.fields, &builder.values)?;
+        //
+        let mut template = String::from("update `{table_name}` set `{update_fields}`");
+
+        Ok(format!(
+            // "update `{table_name}` set `{update_fields}`;",
+            template.as_str(),
+            table_name=builder.table_name,
+            fields=fields,
+            values=values,
+        ))
+
+        Err("".into())
+    }
+
     pub fn operator_to_sql(&self, operator: &Operator) -> String {
         match operator {
             Operator::Eq => "=",
@@ -169,9 +189,10 @@ impl<'a> PostgresDialect<'a> {
 
 impl<'a> Dialect for PostgresDialect<'a> {
     fn to_sql(&self) -> Result<String> {
-        match &self.query_builder {
+        match self.query_builder {
             QueryBuilderType::Insert(builder) => self.insert_to_sql(builder),
             QueryBuilderType::Delete(builder) => self.delete_to_sql(builder),
+            QueryBuilderType::Update(builder) => self.update_to_sql(builder),
             _ => unimplemented!(),
         }
     }
