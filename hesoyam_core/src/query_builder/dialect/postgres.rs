@@ -1,13 +1,25 @@
-use crate::{Field, FieldType, InsertQueryBuilder, InsertValue, QueryBuilder, QueryBuilderType, Result, DeleteQueryBuilder, Condition, Operator};
+use crate::{Field, FieldType, InsertQueryBuilder, InsertValue, QueryBuilderType, Result, DeleteQueryBuilder, Condition, Operator};
 use crate::query_builder::Dialect;
 
 pub struct PostgresDialect<'a> {
-    query_builder: &'a QueryBuilder,
+    query_builder: QueryBuilderType<'a>,
 }
 
 impl<'a> PostgresDialect<'a> {
-    pub fn new(query_builder: &'a QueryBuilder) -> Self {
-        Self { query_builder }
+    // pub fn new(query_builder: &'a QueryBuilderType) -> Self {
+    //     Self { query_builder }
+    // }
+
+    pub fn from_insert_query_builder(builder: &'a InsertQueryBuilder) -> Self {
+        Self {
+            query_builder: QueryBuilderType::Insert(builder),
+        }
+    }
+
+    pub fn from_delete_query_builder(builder: &'a DeleteQueryBuilder) -> Self {
+        Self {
+            query_builder: QueryBuilderType::Delete(builder),
+        }
     }
 
     // insert
@@ -157,7 +169,7 @@ impl<'a> PostgresDialect<'a> {
 
 impl<'a> Dialect for PostgresDialect<'a> {
     fn to_sql(&self) -> Result<String> {
-        match &self.query_builder.builder_type {
+        match &self.query_builder {
             QueryBuilderType::Insert(builder) => self.insert_to_sql(builder),
             QueryBuilderType::Delete(builder) => self.delete_to_sql(builder),
             _ => unimplemented!(),

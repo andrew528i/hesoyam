@@ -25,11 +25,11 @@ pub(in crate) fn gen_model_delete_code(ctx: &ModelContext) -> TokenStream2 {
         // }
 
         pub trait #delete_many_ident {
-            fn delete(conditions: Vec<hesoyam::Condition>) -> hesoyam::QueryBuilder;
+            fn delete(conditions: Vec<hesoyam::Condition>) -> hesoyam::DeleteQueryBuilder;
         }
 
         impl #delete_many_ident for #struct_ident {
-            fn delete(conditions: Vec<hesoyam::Condition>) -> hesoyam::QueryBuilder {
+            fn delete(conditions: Vec<hesoyam::Condition>) -> hesoyam::DeleteQueryBuilder {
                 hesoyam::QueryBuilder::delete(
                     #dialect.to_owned(),
                     #struct_ident::table_name(),

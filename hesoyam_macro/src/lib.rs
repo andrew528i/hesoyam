@@ -10,7 +10,6 @@ use crate::gen::model_delete::gen_model_delete_code;
 
 mod context;
 mod gen;
-mod insert;
 
 #[proc_macro_attribute]
 pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {

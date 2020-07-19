@@ -19,11 +19,11 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
 
     quote! {
         pub trait #insert_one_ident {
-            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::QueryBuilder;
+            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::InsertQueryBuilder;
         }
 
         impl #insert_one_ident for #struct_ident {
-            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::QueryBuilder {
+            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::InsertQueryBuilder {
                 let mut value: std::collections::HashMap<hesoyam::Field, Box<dyn std::any::Any>> = std::collections::HashMap::new();
 
                 #(
@@ -39,11 +39,11 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
         }
 
         pub trait #insert_many_ident {
-            fn save(&self) -> hesoyam::QueryBuilder;
+            fn save(&self) -> hesoyam::InsertQueryBuilder;
         }
 
         impl #insert_many_ident for Vec<#struct_ident> {
-            fn save(&self) -> hesoyam::QueryBuilder {
+            fn save(&self) -> hesoyam::InsertQueryBuilder {
                 let mut values: Vec<std::collections::HashMap<hesoyam::Field, Box<dyn std::any::Any>>> = Vec::new();
 
                 for v in self.iter() {

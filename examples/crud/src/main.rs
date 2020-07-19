@@ -1,4 +1,4 @@
-use hesoyam::Model;
+use hesoyam::{Model, ToSql}; // TODO: use hesoyam::prelude::*
 use model::*;
 
 mod model;
@@ -10,8 +10,8 @@ fn main() {
         User { name: "Tom".to_owned(), age: 30 },
     ];
 
-    let res_1 = User::save("John".to_owned(), 20).to_sql();
-    let res_2 = users.save().to_sql();
+    let res_1 = User::save("John".to_owned(), 20).to_sql().unwrap();
+    let res_2 = users.save().to_sql().unwrap();
 
     println!(
         "table_name: {}\ncompiled queries:\n{}\n{}",
@@ -22,8 +22,9 @@ fn main() {
     // delete
     let res = User::delete(vec![
         User::field_name.eq(&"John".to_owned()),
-        User::field_age.lte(&20),
-    ]).to_sql();
+        User::field_age.gte(&20),
+        User::field_age.lte(&30),
+    ]).to_sql().unwrap();
 
     println!("{}", res);
 }

@@ -1,15 +1,16 @@
-use crate::{Field, Dialect, PostgresDialect, InsertQueryBuilder, InsertValue, DeleteQueryBuilder, Condition};
+use crate::{Field, InsertQueryBuilder, InsertValue, DeleteQueryBuilder, Condition, Result};
 
-pub enum QueryBuilderType {
-    Insert(InsertQueryBuilder),
+pub enum QueryBuilderType<'a> {
+    Insert(&'a InsertQueryBuilder),
     Select,
     Update,
-    Delete(DeleteQueryBuilder),
+    Delete(&'a DeleteQueryBuilder),
 }
 
-pub struct QueryBuilder {
-    pub builder_type: QueryBuilderType,
-    pub dialect: String,
+pub struct QueryBuilder {}
+
+pub trait ToSql {
+    fn to_sql(&self) -> Result<String>;
 }
 
 impl QueryBuilder {
@@ -18,32 +19,24 @@ impl QueryBuilder {
         table_name: String,
         fields: Vec<Field>,
         values: Vec<InsertValue>,
-    ) -> Self {
-        Self {
-            builder_type: QueryBuilderType::Insert(
-                InsertQueryBuilder { table_name, fields, values }),
-            dialect,
-        }
+    ) -> InsertQueryBuilder {
+        InsertQueryBuilder { dialect, table_name, fields, values }
     }
 
     pub fn delete(
         dialect: String,
         table_name: String,
         conditions: Vec<Condition>,
-    ) -> Self {
-        Self {
-            builder_type: QueryBuilderType::Delete(
-                DeleteQueryBuilder { table_name, conditions }),
-            dialect,
-        }
+    ) -> DeleteQueryBuilder {
+        DeleteQueryBuilder { dialect, table_name, conditions }
     }
 
-    pub fn to_sql(&self) -> String {
-        let dialect = match self.dialect.as_str() {
-            "postgres" => PostgresDialect::new(self),
-            d => unimplemented!("{} dialect is not implemented yet", d),
-        };
-
-        dialect.to_sql().unwrap()
-    }
+    // pub fn to_sql(&self) -> String {
+    //     let dialect = match self.dialect.as_str() {
+    //         "postgres" => PostgresDialect::new(self),
+    //         d => unimplemented!("{} dialect is not implemented yet", d),
+    //     };
+    //
+    //     dialect.to_sql().unwrap()
+    // }
 }
