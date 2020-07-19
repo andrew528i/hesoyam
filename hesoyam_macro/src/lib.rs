@@ -6,6 +6,7 @@ use crate::context::ModelContext;
 use crate::gen::model::gen_model_code;
 use crate::gen::model_impl::gen_model_impl_code;
 use crate::gen::model_insert::gen_model_insert_code;
+use crate::gen::model_delete::gen_model_delete_code;
 
 mod context;
 mod gen;
@@ -24,6 +25,7 @@ pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {
     let model_code = gen_model_code(&ctx);
     let model_impl_code = gen_model_impl_code(&ctx);
     let model_insert_code = gen_model_insert_code(&ctx);
+    let model_delete_code = gen_model_delete_code(&ctx);
 
     let output = quote! {
         #derive_input_copy
@@ -31,7 +33,11 @@ pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {
         #model_code
         #model_impl_code
         #model_insert_code
+        #model_delete_code
     };
+
+    // println!("{}", output.to_string());
+    // panic!("debug interruption");
 
     TokenStream::from(output)
 }

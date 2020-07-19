@@ -4,6 +4,7 @@ use model::*;
 mod model;
 
 fn main() {
+    // insert
     let users = vec![
         User { name: "John".to_owned(), age: 20 },
         User { name: "Tom".to_owned(), age: 30 },
@@ -17,4 +18,12 @@ fn main() {
         User::table_name(),
         res_1,
         res_2);
+
+    // delete
+    let res = User::delete(vec![
+        User::field_name.eq(&"John".to_owned()),
+        User::field_age.lte(&20),
+    ]).to_sql();
+
+    println!("{}", res);
 }

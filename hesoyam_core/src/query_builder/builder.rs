@@ -1,11 +1,10 @@
-use crate::{Field, Dialect, PostgresDialect};
-use crate::query_builder::insert::{InsertQueryBuilder, InsertValue};
+use crate::{Field, Dialect, PostgresDialect, InsertQueryBuilder, InsertValue, DeleteQueryBuilder, Condition};
 
 pub enum QueryBuilderType {
     Insert(InsertQueryBuilder),
     Select,
     Update,
-    Delete,
+    Delete(DeleteQueryBuilder),
 }
 
 pub struct QueryBuilder {
@@ -23,6 +22,18 @@ impl QueryBuilder {
         Self {
             builder_type: QueryBuilderType::Insert(
                 InsertQueryBuilder { table_name, fields, values }),
+            dialect,
+        }
+    }
+
+    pub fn delete(
+        dialect: String,
+        table_name: String,
+        conditions: Vec<Condition>,
+    ) -> Self {
+        Self {
+            builder_type: QueryBuilderType::Delete(
+                DeleteQueryBuilder { table_name, conditions }),
             dialect,
         }
     }
