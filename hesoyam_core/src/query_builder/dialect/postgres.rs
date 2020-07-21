@@ -10,6 +10,7 @@ impl<'a> ToString for PostgresDialect<'_> {
         match self.query_builder.query_type {
             QueryType::Insert => self.insert_to_sql(),
             QueryType::Delete => self.delete_to_sql(),
+            QueryType::Update => self.update_to_sql(),
             _ => unimplemented!(),
         }.unwrap()
     }

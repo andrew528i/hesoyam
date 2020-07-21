@@ -21,32 +21,34 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
         use hesoyam::ToSql as _ToSql;
 
         pub trait #insert_one_ident {
-            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::CompiledQuery;
+            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::QueryBuilder;
         }
 
         impl #insert_one_ident for #struct_ident {
-            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::CompiledQuery {
+            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::QueryBuilder {
                 let mut value: std::collections::HashMap<hesoyam::Field, Box<dyn std::any::Any>> = std::collections::HashMap::new();
 
                 #(
                     value.insert(#struct_ident::#field_ident, Box::new(#field_ident.clone()));
                 )*
 
-                hesoyam::QueryBuilder::insert(#dialect.to_owned()).
-                    model(
-                        #struct_ident::table_name(),
-                        #struct_ident::fields()).
-                    values(vec![value]).
-                    to_sql().unwrap()
+                let mut query_builder = hesoyam::QueryBuilder::insert(#dialect.to_owned());
+
+                query_builder.model(
+                    #struct_ident::table_name(),
+                    #struct_ident::fields()).
+                values(vec![value]);
+
+                query_builder
             }
         }
 
         pub trait #insert_many_ident {
-            fn save(&self) -> hesoyam::CompiledQuery;
+            fn save(&self) -> hesoyam::QueryBuilder;
         }
 
         impl #insert_many_ident for Vec<#struct_ident> {
-            fn save(&self) -> hesoyam::CompiledQuery {
+            fn save(&self) -> hesoyam::QueryBuilder {
                 let mut values: Vec<hesoyam::InsertValue> = Vec::new();
 
                 for v in self.iter() {
@@ -59,12 +61,14 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
                     values.push(value);
                 }
 
-                hesoyam::QueryBuilder::insert(#dialect.to_owned()).
-                    model(
-                        #struct_ident::table_name(),
-                        #struct_ident::fields()).
-                    values(values).
-                    to_sql().unwrap()
+                let mut query_builder = hesoyam::QueryBuilder::insert(#dialect.to_owned());
+
+                query_builder.model(
+                    #struct_ident::table_name(),
+                    #struct_ident::fields()).
+                values(values);
+
+                query_builder
             }
         }
     }
