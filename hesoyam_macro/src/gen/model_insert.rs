@@ -18,36 +18,39 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
     let insert_many_ident = syn::Ident::new(&insert_many_ident, struct_span.clone());
 
     quote! {
+        use hesoyam::ToSql as _ToSql;
+
         pub trait #insert_one_ident {
-            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::InsertQueryBuilder;
+            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::CompiledQuery;
         }
 
         impl #insert_one_ident for #struct_ident {
-            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::InsertQueryBuilder {
+            fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::CompiledQuery {
                 let mut value: std::collections::HashMap<hesoyam::Field, Box<dyn std::any::Any>> = std::collections::HashMap::new();
 
                 #(
-                    value.insert(#struct_ident::#field_ident, Box::new(#field_ident));
+                    value.insert(#struct_ident::#field_ident, Box::new(#field_ident.clone()));
                 )*
 
-                hesoyam::QueryBuilder::insert(
-                    #dialect.to_owned(),
-                    #struct_ident::table_name(),
-                    #struct_ident::fields(),
-                    vec![value])
+                hesoyam::QueryBuilder::insert(#dialect.to_owned()).
+                    model(
+                        #struct_ident::table_name(),
+                        #struct_ident::fields()).
+                    values(vec![value]).
+                    to_sql().unwrap()
             }
         }
 
         pub trait #insert_many_ident {
-            fn save(&self) -> hesoyam::InsertQueryBuilder;
+            fn save(&self) -> hesoyam::CompiledQuery;
         }
 
         impl #insert_many_ident for Vec<#struct_ident> {
-            fn save(&self) -> hesoyam::InsertQueryBuilder {
-                let mut values: Vec<std::collections::HashMap<hesoyam::Field, Box<dyn std::any::Any>>> = Vec::new();
+            fn save(&self) -> hesoyam::CompiledQuery {
+                let mut values: Vec<hesoyam::InsertValue> = Vec::new();
 
                 for v in self.iter() {
-                    let mut value: std::collections::HashMap<hesoyam::Field, Box<dyn std::any::Any>> = std::collections::HashMap::new();
+                    let mut value: hesoyam::InsertValue = std::collections::HashMap::new();
 
                     #(
                         value.insert(#struct_ident::#field_ident, Box::new(v.#struct_field_ident.clone()));
@@ -56,11 +59,12 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
                     values.push(value);
                 }
 
-                hesoyam::QueryBuilder::insert(
-                    #dialect.to_owned(),
-                    #struct_ident::table_name(),
-                    #struct_ident::fields(),
-                    values)
+                hesoyam::QueryBuilder::insert(#dialect.to_owned()).
+                    model(
+                        #struct_ident::table_name(),
+                        #struct_ident::fields()).
+                    values(values).
+                    to_sql().unwrap()
             }
         }
     }

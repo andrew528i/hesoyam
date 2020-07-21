@@ -1,6 +1,5 @@
 use std::any::Any;
 
-#[derive(Debug)]
 pub enum Operator {
     Eq,
     NotEq,
@@ -13,7 +12,6 @@ pub enum Operator {
     IsNot,
 }
 
-#[derive(Debug)]
 pub struct Condition {
     pub name: String,
     pub operator: Operator,

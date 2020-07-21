@@ -4,6 +4,7 @@ use syn::export::Debug;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Field {
+    // using &str against String because field_%s is const
     pub name: &'static str,
     pub field_type: FieldType,
 }
