@@ -1,4 +1,4 @@
-use crate::{Field, FieldType, InsertValue, Result, QueryBuilder, QueryType, InsertToSql, DeleteToSql, Condition, Operator, UpdateToSql, SetValue};
+use crate::{Field, FieldType, InsertValue, Result, QueryBuilder, QueryType, InsertToSql, DeleteToSql, Condition, Operator, UpdateToSql, SetValue, SelectToSql, Selectable};
 use std::any::Any;
 
 pub struct PostgresDialect<'a> {
@@ -11,7 +11,7 @@ impl<'a> ToString for PostgresDialect<'_> {
             QueryType::Insert => self.insert_to_sql(),
             QueryType::Delete => self.delete_to_sql(),
             QueryType::Update => self.update_to_sql(),
-            _ => unimplemented!(),
+            QueryType::Select => self.select_to_sql(),
         }.unwrap()
     }
 }
@@ -143,7 +143,17 @@ impl<'a> InsertToSql for PostgresDialect<'_> {
         let mut value_parts = Vec::new();
 
         for f in fields.iter() {
-            let field_value = value.get(f).unwrap();
+            let field_value = match value.get(f) {
+                Some(v) => v,
+                None => {
+                    if f.is_primary_key {
+                        continue
+                    } else {
+                        panic!("required field not found: {}", f.name)
+                    }
+                },
+            };
+
             let insert_value: String = match &f.field_type {
                 FieldType::String => {
                     let v = field_value.downcast_ref::<String>().unwrap();
@@ -197,13 +207,14 @@ impl<'a> UpdateToSql for PostgresDialect<'_> {
         let table_name = &self.query_builder.update_clause.table_name;
         let set_values = self.update_values_to_sql(&self.query_builder.update_clause.values);
 
-        let query = match &self.query_builder.update_clause.values.len() {
+        let query = match &self.query_builder.where_clause.conditions.len() {
             0 => format!(
                 "update `{table_name}` set {set_values}",
                 table_name=table_name,
                 set_values=set_values),
             _ => {
                 let where_ = self.conditions_to_sql(&self.query_builder.where_clause.conditions)?;
+
                 format!(
                     "update `{table_name}` set {set_values} where {where_}",
                     table_name=table_name,
@@ -213,6 +224,43 @@ impl<'a> UpdateToSql for PostgresDialect<'_> {
         };
 
         Ok(query)
+    }
+}
+
+impl<'a> SelectToSql for PostgresDialect<'_> {
+    fn select_to_sql(&self) -> Result<String> {
+        let table_name = &self.query_builder.select_clause.table_name;
+        let fields = self.select_fields_to_sql(&self.query_builder.select_clause.values);
+
+        let mut result = format!(
+            "select {fields} from {table_name}",
+            fields=fields,
+            table_name=table_name);
+
+        if self.query_builder.where_clause.conditions.len() > 0 {
+            let where_ = self.conditions_to_sql(&self.query_builder.where_clause.conditions)?;
+
+            result.push_str(format!(" where {where_}", where_=where_).as_str())
+        }
+
+        result.push_str(";");
+
+        Ok(result)
+    }
+
+    fn select_fields_to_sql(&self, values: &Vec<Selectable>) -> String {
+        let values: Vec<String> = values.iter().
+            map(|s| self.select_value_to_sql(s)).
+            collect();
+
+        values.join(",")
+    }
+
+    fn select_value_to_sql(&self, value: &Selectable) -> String {
+        match value {
+            Selectable::Field(f) => format!("`{}`.`{}`", f.table_name, f.name),
+            _ => unimplemented!(),
+        }
     }
 }
 

@@ -17,11 +17,26 @@ pub(in crate) fn gen_model_code(ctx: &ModelContext) -> TokenStream2 {
 
             fn fields() -> Vec<hesoyam::Field> {
                 let mut fields = Vec::new();
+                let id_field = hesoyam::Field {
+                    name: "id",
+                    table_name: #table_name,
+                    field_type: hesoyam::FieldType::Integer,
+                    is_primary_key: true,
+                    is_null: false,
+                };
+
+                fields.push(id_field);
 
                 #(
                     let name = #field_name;
                     let field_type = #field_type;
-                    let field = hesoyam::Field { name, field_type };
+                    let field = hesoyam::Field {
+                        name,
+                        field_type,
+                        table_name: #table_name,
+                        is_primary_key: false,
+                        is_null: false,
+                    };
 
                     fields.push(field);
                 )*

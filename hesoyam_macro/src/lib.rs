@@ -8,6 +8,7 @@ use crate::gen::model_impl::gen_model_impl_code;
 use crate::gen::model_insert::gen_model_insert_code;
 use crate::gen::model_delete::gen_model_delete_code;
 use crate::gen::model_update::gen_model_update_code;
+use crate::gen::model_select::gen_model_select_code;
 
 mod context;
 mod gen;
@@ -27,6 +28,7 @@ pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {
     let model_insert_code = gen_model_insert_code(&ctx);
     let model_delete_code = gen_model_delete_code(&ctx);
     let model_update_code = gen_model_update_code(&ctx);
+    let model_select_code = gen_model_select_code(&ctx);
 
     let output = quote! {
         #derive_input_copy
@@ -36,6 +38,7 @@ pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {
         #model_insert_code
         #model_delete_code
         #model_update_code
+        #model_select_code
     };
 
     // println!("{}", output.to_string());

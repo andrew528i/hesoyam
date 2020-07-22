@@ -1,4 +1,4 @@
-use crate::{Result, ToSql, Field, InsertValue};
+use crate::{Result, ToSql, Field, InsertValue, Selectable};
 
 pub trait Dialect: ToSql {
     // create_schema(&self) -> Result<String>;
@@ -38,4 +38,6 @@ pub(in crate) trait UpdateToSql {
 
 pub(in crate) trait SelectToSql {
     fn select_to_sql(&self) -> Result<String>;
+    fn select_fields_to_sql(&self, values: &Vec<Selectable>) -> String;
+    fn select_value_to_sql(&self, value: &Selectable) -> String;
 }

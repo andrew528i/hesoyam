@@ -5,20 +5,7 @@ pub trait Model {
     fn fields() -> Vec<Field>;
 }
 
-// pub struct Model {
-//     pub table_name: String,
-//     pub fields: Vec<Field>,
-// }
-//
-// impl Model {
-//     pub fn from_syn_struct(table_name: String, item: &DataStruct) -> Self {
-//         let fields = item.clone().fields.into_iter().
-//             map(Field::from_syn_field).
-//             collect();
-//
-//         Self {
-//             table_name,
-//             fields,
-//         }
-//     }
-// }
+pub struct Relation {
+    pub source: String,
+    pub destination: String,
+}

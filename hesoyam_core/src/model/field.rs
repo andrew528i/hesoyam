@@ -6,7 +6,11 @@ use syn::export::Debug;
 pub struct Field {
     // using &str against String because field_%s is const
     pub name: &'static str,
+    pub table_name: &'static str,
     pub field_type: FieldType,
+
+    pub is_primary_key: bool,
+    pub is_null: bool,
 }
 
 impl Field {

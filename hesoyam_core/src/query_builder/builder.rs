@@ -1,4 +1,4 @@
-use crate::{Field, Result, InsertClause, PostgresDialect, CompiledQuery, DeleteClause, Condition, WhereClause, UpdateClause, SetValue, InsertValue};
+use crate::{Field, Result, InsertClause, PostgresDialect, DeleteClause, Condition, WhereClause, UpdateClause, SetValue, InsertValue, SelectClause, Selectable};
 
 #[derive(Debug)]
 pub enum QueryType {
@@ -15,14 +15,15 @@ pub struct QueryBuilder {
     pub delete_clause: DeleteClause,
     pub update_clause: UpdateClause,
     pub where_clause: WhereClause,
+    pub select_clause: SelectClause,
 }
 
 pub trait ToSql {
-    fn to_sql(&self) -> Result<CompiledQuery>;
+    fn to_sql(&self) -> Result<String>;
 }
 
 impl ToSql for QueryBuilder {
-    fn to_sql(&self) -> Result<CompiledQuery> {
+    fn to_sql(&self) -> Result<String> {
         let dialect = match self.dialect.as_str() {
             // TODO: dialect name -> const
             "postgres" => {
@@ -31,10 +32,7 @@ impl ToSql for QueryBuilder {
             _ => unimplemented!(),
         };
 
-        Ok(CompiledQuery {
-            dialect: self.dialect.clone(),
-            query: dialect.to_string(),
-        })
+        Ok(dialect.to_string())
     }
 }
 
@@ -47,6 +45,7 @@ impl QueryBuilder {
             delete_clause: DeleteClause::default(),
             update_clause: UpdateClause::default(),
             where_clause: WhereClause::default(),
+            select_clause: SelectClause::default(),
         }
     }
 
@@ -58,6 +57,7 @@ impl QueryBuilder {
             delete_clause: DeleteClause::default(),
             update_clause: UpdateClause::default(),
             where_clause: WhereClause::default(),
+            select_clause: SelectClause::default(),
         }
     }
 
@@ -69,7 +69,26 @@ impl QueryBuilder {
             delete_clause: DeleteClause::default(),
             update_clause: UpdateClause::default(),
             where_clause: WhereClause::default(),
+            select_clause: SelectClause::default(),
         }
+    }
+
+    pub fn select_(dialect: String, values: Vec<Selectable>) -> Self {
+        Self {
+            query_type: QueryType::Select,
+            dialect,
+            insert_clause: InsertClause::default(),
+            delete_clause: DeleteClause::default(),
+            update_clause: UpdateClause::default(),
+            where_clause: WhereClause::default(),
+            select_clause: SelectClause::from_values(values),
+        }
+    }
+
+    pub fn select(&mut self, values: Vec<Selectable>) -> &mut Self {
+        self.select_clause.values.extend(values);
+
+        self
     }
 
     pub fn model(&mut self, table_name: String, fields: Vec<Field>) -> &mut Self {
@@ -83,8 +102,10 @@ impl QueryBuilder {
             },
             QueryType::Update => {
                 self.update_clause.table_name = table_name;
+            },
+            QueryType::Select => {
+                self.select_clause.table_name = table_name;
             }
-            _ => unimplemented!(),
         }
 
         self
@@ -117,57 +138,4 @@ impl QueryBuilder {
 
         self
     }
-
-    // pub fn build(&self) -> Self {
-    //     Self {
-    //         query_type: self.query_type.clone(),
-    //         dialect: self.dialect.clone(),
-    //         insert_clause: self.insert_clause.clone(),
-    //         delete_clause: self.delete_clause.clone(),
-    //         update_clause: self.update_clause.clone(),
-    //         where_clause: self.where_clause.clone(),
-    //     }
-    // }
-    //
-    // pub fn delete() -> Self {
-    //
-    // }
-    //
-    // pub fn update() -> Self {
-    //
-    // }
-    //
-    // pub fn select() -> Self {
-    //
-    // }
-
-    // pub fn insert(
-    //     dialect: String,
-    //     table_name: String,
-    //     fields: Vec<Field>,
-    //     values: Vec<InsertValue>,
-    // ) -> InsertQueryBuilder {
-    //     InsertQueryBuilder { dialect, table_name, fields, values }
-    // }
-    //
-    // pub fn delete(
-    //     dialect: String,
-    //     table_name: String,
-    //     conditions: Vec<Condition>,
-    // ) -> DeleteQueryBuilder {
-    //     DeleteQueryBuilder { dialect, table_name, conditions }
-    // }
-    //
-    // pub fn update(
-    //     dialect: String,
-    //     table_name: String,
-    //     update_fields: Vec<UpdateField>,
-    // ) -> UpdateQueryBuilder {
-    //     UpdateQueryBuilder {
-    //         dialect,
-    //         table_name,
-    //         update_fields,
-    //         filters: vec![],
-    //     }
-    // }
 }

@@ -14,8 +14,8 @@ fn main() {
         User { name: "Tom".to_owned(), age: 30 },
     ];
 
-    let res_1 = User::save("John".to_owned(), 20).to_sql().unwrap().query;
-    let res_2 = users.save().to_sql().unwrap().query;
+    let res_1 = User::save("John".to_owned(), 20).to_sql().unwrap();
+    let res_2 = users.save().to_sql().unwrap();
 
     println!("insert one:{}", res_1);
     println!("insert many: {}", res_2);
@@ -25,7 +25,7 @@ fn main() {
         User::field_name.eq(&"John".to_owned()),
         User::field_age.gte(&20),
         User::field_age.lte(&30),
-    ]).to_sql().unwrap().query;
+    ]).to_sql().unwrap();
 
     println!("delete: {}", res);
 
@@ -37,7 +37,12 @@ fn main() {
     let res = User::update(vec![
         User::field_name.eq(&"John".to_owned()),
         User::field_age.gt(&20),
-    ]).set(update_set).to_sql().unwrap().query;
+    ]).set(update_set).to_sql().unwrap();
 
     println!("update: {}", res);
+
+    // select
+    let res = User::select().filter(vec![User::field_age.gte(&20)]).to_sql().unwrap();
+
+    println!("select: {}", res);
 }
