@@ -1,6 +1,7 @@
-use crate::Field;
-use std::collections::HashMap;
 use std::any::Any;
+use std::collections::HashMap;
+
+use crate::Field;
 
 pub type InsertValue = HashMap<Field, Box<dyn Any>>;
 

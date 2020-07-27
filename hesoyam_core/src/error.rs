@@ -1,40 +1,35 @@
-use std::error::Error as StdError;
-use std::fmt;
-use std::result::Result as StdResult;
+error_chain! {
+    types {
+        Error, ErrorKind_, ResultExt, Result_;
+    }
 
-use syn::export::Formatter;
+    foreign_links {
+        PostgresError(tokio_postgres::error::Error);
+    }
 
-type BoxError = Box<dyn StdError + Send + Sync>;
-pub type Result<T> = StdResult<T, BoxError>;
+    errors {
+        ClientNotFound(dialect: String) {
+            description("Client not found")
+            display("Unable to get client for `{}` dialect", dialect)
+        }
 
-// common error
+        NotConnected {
+            description("Please connect first")
+            display("Please client.connect first")
+        }
 
-#[derive(Debug)]
-pub enum Error {
-    QueryBuilder(BoxError),
-}
+        UnknownRow
 
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            Error::QueryBuilder(e) => write!(f, "query builder error: {}", e),
+        ParseError(e: String) {
+            description("FromSql ParseError")
+            display("Failed to parse from string: {}", e)
         }
     }
+
+    skip_msg_variant
 }
 
-impl StdError for Error {}
+#[allow(unused)]
+pub type Result<T> = Result_<T>;
 
-// query builder error
-
-#[derive(Debug)]
-struct QueryBuilderError {
-    message: String,
-}
-
-impl fmt::Display for QueryBuilderError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.message)
-    }
-}
-
-impl StdError for QueryBuilderError {}
+pub type ErrorKind = ErrorKind_;

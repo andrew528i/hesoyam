@@ -17,8 +17,12 @@ pub(in crate) fn gen_model_insert_code(ctx: &ModelContext) -> TokenStream2 {
     let insert_many_ident = format!("{}InsertMany", struct_ident.to_string());
     let insert_many_ident = syn::Ident::new(&insert_many_ident, struct_span.clone());
 
+    let to_sql_ident = struct_ident.to_string();
+    let to_sql_ident = format!("ToSql{}", to_sql_ident);
+    let to_sql_ident = syn::Ident::new(to_sql_ident.as_str(), struct_ident.span());
+    
     quote! {
-        use hesoyam::ToSql as _ToSql;
+        use hesoyam::ToSql as #to_sql_ident;
 
         pub trait #insert_one_ident {
             fn save(#(#field_ident: #struct_field_type),*) -> hesoyam::QueryBuilder;

@@ -7,6 +7,7 @@ pub struct SelectClause {
 
 pub enum Selectable {
     Field(Field),
+    All,
     Func,
 }
 

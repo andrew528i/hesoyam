@@ -3,7 +3,7 @@ use syn::{AttributeArgs, DataStruct, DeriveInput, Ident};
 use syn::export::{Span, ToTokens};
 use syn::spanned::Spanned;
 
-use hesoyam_core::{FieldType};
+use hesoyam_core::FieldType;
 
 #[derive(Debug, FromMeta)]
 pub(in crate) struct ModelArgs {

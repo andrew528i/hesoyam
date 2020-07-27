@@ -1,6 +1,6 @@
 [package]
 name = "hesoyam_macro"
-version = "1.0.0"
+version = "0.1.0"
 authors = ["Andrew <debiannuser@gmail.com>"]
 edition = "2018"
 
@@ -15,5 +15,5 @@ quote = "1.0.7"
 darling = "0.10.2"
 
 [dependencies.hesoyam_core]
-version = "~1.0.0"
+version = "~0.1.0"
 path = "../hesoyam_core"

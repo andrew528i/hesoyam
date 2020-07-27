@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 hesoyam = { path = "../../hesoyam" }
+
+reqwest = { version = "0.10", features = ["blocking"] }
+csv = "1.1.3"

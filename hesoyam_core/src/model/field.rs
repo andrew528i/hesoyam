@@ -1,6 +1,8 @@
-use crate::{FieldType, Condition, Operator};
 use std::any::Any;
+
 use syn::export::Debug;
+
+use crate::{Condition, FieldType, Operator};
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Field {

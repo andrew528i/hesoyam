@@ -9,10 +9,14 @@ pub(in crate) fn gen_model_code(ctx: &ModelContext) -> TokenStream2 {
     let field_name = &ctx.field_name;
     let field_type = &ctx.field_type;
 
-    quote! {
-        use hesoyam::Model as _Model;
+    let model_ident = struct_ident.to_string();
+    let model_ident = format!("Model{}", model_ident);
+    let model_ident = syn::Ident::new(model_ident.as_str(), struct_ident.span());
 
-        impl _Model for #struct_ident {
+    quote! {
+        use hesoyam::Model as #model_ident;
+
+        impl #model_ident for #struct_ident {
             fn table_name() -> String { String::from(#table_name) }
 
             fn fields() -> Vec<hesoyam::Field> {

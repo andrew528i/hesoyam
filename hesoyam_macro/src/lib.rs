@@ -4,11 +4,15 @@ use syn::export::TokenStream;
 
 use crate::context::ModelContext;
 use crate::gen::model::gen_model_code;
+use crate::gen::model_delete::gen_model_delete_code;
 use crate::gen::model_impl::gen_model_impl_code;
 use crate::gen::model_insert::gen_model_insert_code;
-use crate::gen::model_delete::gen_model_delete_code;
-use crate::gen::model_update::gen_model_update_code;
 use crate::gen::model_select::gen_model_select_code;
+use crate::gen::model_update::gen_model_update_code;
+use crate::gen::query_result_impl::gen_query_result_impl;
+
+#[cfg(test)]
+mod tests;
 
 mod context;
 mod gen;
@@ -41,8 +45,22 @@ pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {
         #model_select_code
     };
 
-    // println!("{}", output.to_string());
-    // panic!("debug interruption");
+    TokenStream::from(output)
+}
+
+#[proc_macro_attribute]
+pub fn query_result(_: TokenStream, input: TokenStream) -> TokenStream {
+    let input_copy = input.clone();
+    let derive_input = parse_macro_input!(input as DeriveInput);
+    let derive_input_copy = parse_macro_input!(input_copy as DeriveInput);
+
+    let impl_code = gen_query_result_impl(derive_input);
+
+    let output = quote! {
+        #derive_input_copy
+
+        #impl_code
+    };
 
     TokenStream::from(output)
 }

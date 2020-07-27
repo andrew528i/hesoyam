@@ -16,6 +16,9 @@ pub enum FieldType {
 
     Boolean,
 
+    Float,
+    BigFloat,
+
     Array(Vec<Self>),
     Enum(Vec<String>),
 }
@@ -34,6 +37,9 @@ impl FieldType {
             "u64" => FieldType::BigUnsignedInteger,
 
             "bool" => FieldType::Boolean,
+
+            "f32" => FieldType::Float,
+            "f64" => FieldType::BigFloat,
 
             unknown_type => unimplemented!("{} is unknown type", unknown_type),
         }

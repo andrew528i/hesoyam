@@ -1,10 +1,7 @@
-use crate::{Result, ToSql, Field, InsertValue, Selectable};
+use crate::{Field, InsertValue, Selectable, ToSql};
+use crate::error::*;
 
-pub trait Dialect: ToSql {
-    // create_schema(&self) -> Result<String>;
-    // to_sql()
-    // execute()
-}
+pub trait Dialect: ToSql {}
 
 pub(in crate) trait InsertToSql {
     fn insert_to_sql(&self) -> Result<String>;

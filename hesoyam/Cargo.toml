@@ -1,6 +1,6 @@
 [package]
 name = "hesoyam"
-version = "1.0.0"
+version = "0.1.0"
 authors = ["Andrew <debiannuser@gmail.com>"]
 edition = "2018"
 
@@ -10,9 +10,9 @@ edition = "2018"
 syn = { version = "1.0.34", features = ["full"] }
 
 [dependencies.hesoyam_core]
-version = "~1.0.0"
+version = "~0.1.0"
 path = "../hesoyam_core"
 
 [dependencies.hesoyam_macro]
-version = "~1.0.0"
+version = "~0.1.0"
 path = "../hesoyam_macro"

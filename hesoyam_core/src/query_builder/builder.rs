@@ -1,4 +1,6 @@
-use crate::{Field, Result, InsertClause, PostgresDialect, DeleteClause, Condition, WhereClause, UpdateClause, SetValue, InsertValue, SelectClause, Selectable};
+use crate::{ClickhouseDialect, Condition, DeleteClause, Field, InsertClause, InsertValue, PostgresDialect, Selectable, SelectClause, SetValue, UpdateClause, WhereClause};
+use crate::client::{ClientManager, QueryResult};
+use crate::error::*;
 
 #[derive(Debug)]
 pub enum QueryType {
@@ -24,11 +26,11 @@ pub trait ToSql {
 
 impl ToSql for QueryBuilder {
     fn to_sql(&self) -> Result<String> {
-        let dialect = match self.dialect.as_str() {
+        // TODO: implement Dialect trait
+        let dialect: Box<dyn ToString> = match self.dialect.as_str() {
             // TODO: dialect name -> const
-            "postgres" => {
-                PostgresDialect::new(&self)
-            },
+            "postgres" => Box::new(PostgresDialect::new(&self)),
+            "clickhouse" => Box::new(ClickhouseDialect::new(&self)),
             _ => unimplemented!(),
         };
 
@@ -137,5 +139,12 @@ impl QueryBuilder {
         };
 
         self
+    }
+
+    pub fn exec(&self, client_manager: &mut ClientManager) -> Result<QueryResult> {
+        let client = client_manager.get_client(&self.dialect).unwrap();
+        let query = self.to_sql().unwrap();
+
+        client.query(query.as_str())
     }
 }

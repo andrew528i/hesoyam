@@ -9,6 +9,7 @@ pub(in crate) fn gen_model_impl_code(ctx: &ModelContext) -> TokenStream2 {
     let table_name = &ctx.table_name;
     let field_type = &ctx.field_type;
     let field_ident = &ctx.field_ident;
+    let struct_field_ident = &ctx.struct_field_ident;
 
     quote! {
         impl #struct_ident {
@@ -30,6 +31,16 @@ pub(in crate) fn gen_model_impl_code(ctx: &ModelContext) -> TokenStream2 {
                     is_null: false,
                 };
             )*
+        }
+
+        impl From<hesoyam::client::Row> for #struct_ident {
+            fn from(row: hesoyam::client::Row) -> Self {
+                Self {
+                    #(
+                        #struct_field_ident: row.get(#field_name).unwrap()
+                    ),*
+                }
+            }
         }
     }
 }
