@@ -42,5 +42,5 @@ pub fn execute(cm: &mut ClientManager) -> Result<()> {
     // users.save().exec(cm);
 
     // insert one to postgres
-    // User::save("John".to_owned(), 20).exec(cm);
+    // User::save("John".to_owned(), 20).exec(&mut cm);
 }
