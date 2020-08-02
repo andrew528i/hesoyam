@@ -1,7 +1,7 @@
 # 🎯 Hesoyam ORM
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/andrew528i/hesoyam/blob/dev/LICENSE.md)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/andrew528i/)
+[![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)](https://github.com/andrew528i/)
 [![Version](https://img.shields.io/badge/Rust-1.45.0-orange.svg)](https://github.com/andrew528i/)
 
 Just another one ORM for for Postgres and Clickhouse. If you found it useful please give us a ⭐ :)
@@ -11,7 +11,7 @@ Just another one ORM for for Postgres and Clickhouse. If you found it useful ple
 `Cargo.toml`:
 ```toml
 [dependencies]
-hesoyam = "0.1.0"
+hesoyam = "0.1.1"
 ```
 
 # Examples
@@ -22,11 +22,14 @@ It assumed that tables already created in db.
 
 `model.rs` be like:
 ```rust
+use chrono::{DateTime, Utc};
+
 #[model(dialect = "postgres", table_name = "users")]
 pub struct User {
     pub name: String,
     pub age: i32,
     pub weight: f32,
+    pub created_at: DateTime<Utc>
 }
 ```
 

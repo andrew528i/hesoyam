@@ -2,6 +2,7 @@ use std::any::Any;
 
 use crate::{Condition, DeleteToSql, Field, FieldType, InsertToSql, InsertValue, Operator, QueryBuilder, QueryType, Selectable, SelectToSql, SetValue, UpdateToSql};
 use crate::error::*;
+use chrono::{DateTime, Utc};
 
 pub struct PostgresDialect<'a> {
     query_builder: &'a QueryBuilder,
@@ -182,6 +183,12 @@ impl<'a> InsertToSql for PostgresDialect<'_> {
                         false => "FALSE".to_owned(),
                     }
                 },
+
+                FieldType::DateTime => {
+                    let value = field_value.downcast_ref::<DateTime<Utc>>().unwrap();
+
+                    value.format("%Y-%m-%d %H:%M:%S%.4f%z").to_string()
+                }
 
                 FieldType::Array(_) => unimplemented!(),
                 FieldType::Enum(_) => unimplemented!(),

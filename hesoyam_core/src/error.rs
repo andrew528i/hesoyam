@@ -5,6 +5,7 @@ error_chain! {
 
     foreign_links {
         PostgresError(tokio_postgres::error::Error);
+        ChronoParseError(chrono::format::ParseError);
     }
 
     errors {
@@ -20,9 +21,9 @@ error_chain! {
 
         UnknownRow
 
-        ParseError(e: String) {
+        ParseError(v: String) {
             description("FromSql ParseError")
-            display("Failed to parse from string: {}", e)
+            display("Failed to parse from string: {}", v)
         }
     }
 

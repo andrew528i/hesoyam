@@ -12,7 +12,7 @@ fn run() -> Result<()> {
         host("").
         user("").
         password("").
-        port(5432).
+        port(54321).
         database("");
 
     let ch_conf = ClickhouseConfig::new().

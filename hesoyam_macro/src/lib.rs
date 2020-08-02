@@ -45,6 +45,8 @@ pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {
         #model_select_code
     };
 
+    // println!("macro output: {}", output.to_string());
+
     TokenStream::from(output)
 }
 

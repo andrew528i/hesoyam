@@ -2,6 +2,7 @@ use std::any::Any;
 
 use crate::{Condition, DeleteToSql, Field, FieldType, InsertToSql, InsertValue, Operator, QueryBuilder, QueryType, Selectable, SelectToSql, SetValue, UpdateToSql};
 use crate::error::*;
+use chrono::{DateTime, Utc};
 
 pub struct ClickhouseDialect<'a> {
     query_builder: &'a QueryBuilder,
@@ -190,6 +191,12 @@ impl<'a> InsertToSql for ClickhouseDialect<'_> {
                         false => "0".to_owned(),
                     }
                 },
+
+                FieldType::DateTime => {
+                    let value = field_value.downcast_ref::<DateTime<Utc>>().unwrap();
+
+                    value.format("%Y-%m-%d %H:%M:%S").to_string()
+                }
 
                 FieldType::Array(_) => unimplemented!(),
                 FieldType::Enum(_) => unimplemented!(),

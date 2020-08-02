@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::hash::Hash;
 
 use crate::error::*;
+use chrono::{DateTime, Utc, NaiveDateTime, TimeZone};
 
 pub struct Row {
     pub(crate) body: HashMap<usize, String>,
@@ -84,5 +85,19 @@ impl FromSql for bool {
             "0" => Ok(false),
             _ => Ok(true),
         }
+    }
+}
+
+impl FromSql for DateTime<Utc> {
+    fn from_sql(value: &str) -> Result<Self> {
+        let dt = NaiveDateTime::parse_from_str(value, "%Y-%m-%d %H:%M:%S")?;
+        let dt: DateTime<Utc> = Utc.from_local_datetime(&dt).unwrap();
+        // {
+        //     LocalResult::None => return Err(ErrorKind::DateTimeParse(value.to_owned()).into()),
+        //     LocalResult::Single(_) => {}
+        //     LocalResult::Ambiguous(_, _) => {}
+        // };
+
+        Ok(dt)
     }
 }

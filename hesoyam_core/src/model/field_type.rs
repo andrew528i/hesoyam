@@ -21,11 +21,13 @@ pub enum FieldType {
 
     Array(Vec<Self>),
     Enum(Vec<String>),
+
+    DateTime,
 }
 
 impl FieldType {
     pub fn from_type_string(type_str: &str) -> Self {
-        match type_str {
+        match type_str.replace(" ", "").as_str() {
             "String" => FieldType::String,
 
             "i8" => FieldType::SmallInteger,
@@ -40,6 +42,8 @@ impl FieldType {
 
             "f32" => FieldType::Float,
             "f64" => FieldType::BigFloat,
+
+            "DateTime<Utc>" => FieldType::DateTime,
 
             unknown_type => unimplemented!("{} is unknown type", unknown_type),
         }

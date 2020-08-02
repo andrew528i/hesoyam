@@ -1,4 +1,5 @@
 use hesoyam::model;
+use chrono::{DateTime, Utc};
 
 #[model(dialect = "postgres", table_name = "users")]
 #[derive(Debug)]
@@ -15,5 +16,5 @@ pub struct MarketQuote {
     pub high: f32,
     pub open: f32,
     pub close: f32,
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
 }
