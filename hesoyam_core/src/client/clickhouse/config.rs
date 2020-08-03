@@ -58,8 +58,18 @@ impl<'a> DBConfig for ClickhouseConfig<'a> {
     }
 
     fn dsn(&self) -> String {
+        if let Some(username) = self.username {
+            if let Some(password) = self.password {
+                return format!(
+                    "{schema}://{username}:{password}@{hostname}:{port}",
+                    schema=self.schema.unwrap(),
+                    username=username,
+                    password=password,
+                    hostname=self.hostname.unwrap(),
+                    port=self.port.unwrap());
+            }
+        }
 
-        // TODO: add user and password
         format!(
             "{schema}://{hostname}:{port}",
             schema=self.schema.unwrap(),

@@ -1,7 +1,7 @@
 # 🎯 Hesoyam ORM
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/andrew528i/hesoyam/blob/dev/LICENSE.md)
-[![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)](https://github.com/andrew528i/)
+[![Version](https://img.shields.io/badge/version-0.1.2-blue.svg)](https://github.com/andrew528i/)
 [![Version](https://img.shields.io/badge/Rust-1.45.0-orange.svg)](https://github.com/andrew528i/)
 
 Just another one ORM for for Postgres and Clickhouse. If you found it useful please give us a ⭐ :)
@@ -11,7 +11,7 @@ Just another one ORM for for Postgres and Clickhouse. If you found it useful ple
 `Cargo.toml`:
 ```toml
 [dependencies]
-hesoyam = "0.1.1"
+hesoyam = "0.1.3"
 ```
 
 # Examples

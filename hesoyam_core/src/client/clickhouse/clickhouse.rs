@@ -26,24 +26,22 @@ impl Client for ClickhouseClient {
         let resp = http_client.
             post(&self.dsn).
             body(query.to_owned()).
-            send().
-            unwrap();
+            send()?;
 
-        let text = resp.text().unwrap();
+        let text = resp.text()?;
         let mut rdr = csv::ReaderBuilder::new().
             delimiter(b'\t').
             has_headers(true).
             from_reader(text.as_bytes());
 
         let mut rows: Vec<Row> = Vec::new();
-        let columns: Vec<String> = rdr.headers().
-            unwrap().
+        let columns: Vec<String> = rdr.headers()?.
             iter().
             map(|f| f.to_owned()).
             collect();
 
         for row in rdr.records() {
-            let row = row.unwrap();
+            let row = row?;
             let mut body: HashMap<usize, String> = HashMap::new();
 
             for (i, c) in row.iter().enumerate() {

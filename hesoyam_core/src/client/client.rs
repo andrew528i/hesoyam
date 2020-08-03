@@ -7,7 +7,7 @@ use postgres::types::FromSql;
 use crate::client::clickhouse::row::{FromSql as CFromSql, Row as CRow, RowIndex as CRowIndex};
 use crate::error::*;
 
-pub trait Client {
+pub trait Client: Send {
     fn connect(&mut self) -> Result<bool>;
     fn query(&mut self, query: &str) -> Result<QueryResult>;
 }

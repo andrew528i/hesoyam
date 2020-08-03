@@ -6,6 +6,8 @@ error_chain! {
     foreign_links {
         PostgresError(tokio_postgres::error::Error);
         ChronoParseError(chrono::format::ParseError);
+        ReqwestError(reqwest::Error);
+        CsvError(csv::Error);
     }
 
     errors {
