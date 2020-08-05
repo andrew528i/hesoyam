@@ -282,6 +282,8 @@ impl<'a> SelectToSql for PostgresDialect<'_> {
             result.push_str(format!(" where {where_}", where_=where_).as_str())
         }
 
+        result.push_str(" order by id desc"); // TODO: remove this temp solution
+
         if let Some(limit) = self.query_builder.limit_clause.limit {
             result.push_str(format!(" limit {}", limit).as_str());
 

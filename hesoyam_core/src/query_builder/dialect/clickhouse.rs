@@ -74,6 +74,10 @@ impl<'a> ClickhouseDialect<'a> {
             str_value = Some(format!("{}", v));
         }
 
+        if let Some(v) = value.downcast_ref::<i64>() {
+            str_value = Some(format!("{}", v));
+        }
+
         if let Some(v) = value.downcast_ref::<u32>() {
             str_value = Some(format!("{}", v));
         }

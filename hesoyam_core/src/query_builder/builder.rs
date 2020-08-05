@@ -1,4 +1,4 @@
-use crate::{ClickhouseDialect, Condition, DeleteClause, Field, InsertClause, InsertValue, PostgresDialect, Selectable, SelectClause, SetValue, UpdateClause, WhereClause, LimitClause};
+use crate::{ClickhouseDialect, Condition, DeleteClause, Field, InsertClause, InsertValue, LimitClause, PostgresDialect, Selectable, SelectClause, SetValue, UpdateClause, WhereClause};
 use crate::client::{ClientManager, QueryResult};
 use crate::error::*;
 
@@ -130,7 +130,9 @@ impl QueryBuilder {
     }
 
     pub fn filter(&mut self, conditions: Vec<Condition>) -> &mut Self {
-        self.where_clause.conditions = conditions;
+        for c in conditions {
+            self.where_clause.conditions.push(c);
+        }
 
         self
     }
