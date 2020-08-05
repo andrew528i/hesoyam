@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use reqwest::blocking::Client as HTTPClient;
+use reqwest::StatusCode;
 
 use crate::client::{Client, DBConfig, QueryResult, Row};
 use crate::client::clickhouse::row::Row as CRow;
@@ -27,6 +28,10 @@ impl Client for ClickhouseClient {
             post(&self.dsn).
             body(query.to_owned()).
             send()?;
+
+        if resp.status() != StatusCode::OK {
+            return Err(ErrorKind::ClickhouseError(resp.text()?).into())
+        }
 
         let text = resp.text()?;
         let mut rdr = csv::ReaderBuilder::new().

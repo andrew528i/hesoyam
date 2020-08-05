@@ -12,8 +12,8 @@ pub fn execute() -> Result<()> {
 
     // insert
     let users = vec![
-        User { name: "John".to_owned(), age: 20 },
-        User { name: "Tom".to_owned(), age: 30 },
+        User::new("John".to_owned(), 20),
+        User::new("Tom".to_owned(), 30),
     ];
 
     let res_1 = User::save("John".to_owned(), 20).to_sql().unwrap();

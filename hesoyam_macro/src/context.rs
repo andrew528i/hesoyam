@@ -18,6 +18,7 @@ pub(in crate) struct ModelContext {
     pub struct_span: Span,
     pub struct_ident: Ident,
     pub table_name: String,
+    pub struct_attrs: Vec<syn::Attribute>,
 
     pub field_name: Vec<String>,
     pub field_type: Vec<FieldType>,
@@ -35,6 +36,8 @@ impl ModelContext {
             syn::Data::Struct(ds) => DataStruct::from(ds.clone()),
             _ => panic!("only struct can be a model"),
         };
+
+        let struct_attrs = derive_input.attrs;
 
         // parse model args: table_name and dialect
         let model_args = match ModelArgs::from_list(&attribute_args) {
@@ -79,6 +82,7 @@ impl ModelContext {
             struct_ident,
             struct_span,
             table_name,
+            struct_attrs,
 
             field_name,
             field_type,

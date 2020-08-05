@@ -55,6 +55,7 @@ impl<'a> ClickhouseDialect<'a> {
             Operator::Like => "like",
             Operator::Is => "is",
             Operator::IsNot => "is not",
+            Operator::In => "in",
         }.to_owned()
     }
 
@@ -83,6 +84,30 @@ impl<'a> ClickhouseDialect<'a> {
 
         if let Some(v) = value.downcast_ref::<f64>() {
             str_value = Some(format!("{}", v));
+        }
+
+        if let Some(v) = value.downcast_ref::<Vec<String>>() {
+            let values = v.iter().
+                map(|s| format!("'{}'", s)).
+                collect::<Vec<String>>().
+                join(",");
+            str_value = Some(format!("({})", values));
+        }
+
+        if let Some(&v) = value.downcast_ref::<&[&str]>() {
+            let values = v.iter().
+                map(|s| format!("'{}'", s)).
+                collect::<Vec<String>>().
+                join(",");
+            str_value = Some(format!("({})", values));
+        }
+
+        if let Some(v) = value.downcast_ref::<Vec<i64>>() {
+            let values = v.iter().
+                map(|&s| format!("{}", s)).
+                collect::<Vec<String>>().
+                join(",");
+            str_value = Some(format!("({})", values));
         }
 
         match str_value {
@@ -170,7 +195,7 @@ impl<'a> InsertToSql for ClickhouseDialect<'_> {
                 FieldType::String => {
                     let v = field_value.downcast_ref::<String>().unwrap();
 
-                    format!("'{}'", v)
+                    format!("'{}'", v.replace("'", "''"))
                 },
 
                 FieldType::SmallUnsignedInteger => field_value.downcast_ref::<u8>().unwrap().to_string(),
@@ -195,7 +220,7 @@ impl<'a> InsertToSql for ClickhouseDialect<'_> {
                 FieldType::DateTime => {
                     let value = field_value.downcast_ref::<DateTime<Utc>>().unwrap();
 
-                    value.format("%Y-%m-%d %H:%M:%S").to_string()
+                    format!("'{}'", value.format("%Y-%m-%d %H:%M:%S").to_string())
                 }
 
                 FieldType::Array(_) => unimplemented!(),
@@ -262,6 +287,14 @@ impl<'a> SelectToSql for ClickhouseDialect<'_> {
             let where_ = self.conditions_to_sql(&self.query_builder.where_clause.conditions)?;
 
             result.push_str(format!(" where {where_}", where_=where_).as_str())
+        }
+
+        if let Some(limit) = self.query_builder.limit_clause.limit {
+            result.push_str(format!(" limit {}", limit).as_str());
+
+            if let Some(offset) = self.query_builder.limit_clause.offset {
+                result.push_str(format!(" offset {}", offset).as_str());
+            }
         }
 
         result.push_str(" format TabSeparatedWithNames;");

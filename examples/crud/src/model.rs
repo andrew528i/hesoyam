@@ -18,3 +18,12 @@ pub struct MarketQuote {
     pub close: f32,
     pub created_at: DateTime<Utc>,
 }
+
+#[model(dialect = "postgres", table_name = "entity")]
+#[derive(Debug)]
+pub struct Entity {
+    name: String,
+    entity_type: i32,
+    created_at: DateTime<Utc>,
+    observable: bool,
+}

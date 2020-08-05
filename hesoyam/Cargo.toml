@@ -1,6 +1,6 @@
 [package]
 name = "hesoyam"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Andrew <debiannuser@gmail.com>"]
 edition = "2018"
 description = "hesoyam orm"
@@ -12,9 +12,9 @@ license = "MIT"
 syn = { version = "1.0.34", features = ["full"] }
 
 [dependencies.hesoyam_core]
-version = "~0.1.3"
+version = "~0.1.4"
 path = "../hesoyam_core"
 
 [dependencies.hesoyam_macro]
-version = "~0.1.3"
+version = "~0.1.4"
 path = "../hesoyam_macro"

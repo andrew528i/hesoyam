@@ -19,10 +19,8 @@ mod gen;
 
 #[proc_macro_attribute]
 pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {
-    let input_copy = input.clone();
     let attribute_args = parse_macro_input!(args as AttributeArgs);
     let derive_input = parse_macro_input!(input as DeriveInput);
-    let derive_input_copy = parse_macro_input!(input_copy as DeriveInput);
 
     let ctx = ModelContext::parse(attribute_args, derive_input);
 
@@ -35,8 +33,6 @@ pub fn model(args: TokenStream, input: TokenStream) -> TokenStream {
     let model_select_code = gen_model_select_code(&ctx);
 
     let output = quote! {
-        #derive_input_copy
-
         #model_code
         #model_impl_code
         #model_insert_code

@@ -27,6 +27,11 @@ error_chain! {
             description("FromSql ParseError")
             display("Failed to parse from string: {}", v)
         }
+
+        ClickhouseError(v: String) {
+            description("clickhouse error")
+            display("clickhouse error: {}", v)
+        }
     }
 
     skip_msg_variant

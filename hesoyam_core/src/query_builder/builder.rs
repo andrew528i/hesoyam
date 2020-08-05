@@ -1,4 +1,4 @@
-use crate::{ClickhouseDialect, Condition, DeleteClause, Field, InsertClause, InsertValue, PostgresDialect, Selectable, SelectClause, SetValue, UpdateClause, WhereClause};
+use crate::{ClickhouseDialect, Condition, DeleteClause, Field, InsertClause, InsertValue, PostgresDialect, Selectable, SelectClause, SetValue, UpdateClause, WhereClause, LimitClause};
 use crate::client::{ClientManager, QueryResult};
 use crate::error::*;
 
@@ -18,6 +18,7 @@ pub struct QueryBuilder {
     pub update_clause: UpdateClause,
     pub where_clause: WhereClause,
     pub select_clause: SelectClause,
+    pub limit_clause: LimitClause,
 }
 
 pub trait ToSql {
@@ -48,6 +49,7 @@ impl QueryBuilder {
             update_clause: UpdateClause::default(),
             where_clause: WhereClause::default(),
             select_clause: SelectClause::default(),
+            limit_clause: Default::default(),
         }
     }
 
@@ -60,6 +62,7 @@ impl QueryBuilder {
             update_clause: UpdateClause::default(),
             where_clause: WhereClause::default(),
             select_clause: SelectClause::default(),
+            limit_clause: Default::default(),
         }
     }
 
@@ -72,6 +75,7 @@ impl QueryBuilder {
             update_clause: UpdateClause::default(),
             where_clause: WhereClause::default(),
             select_clause: SelectClause::default(),
+            limit_clause: Default::default(),
         }
     }
 
@@ -84,6 +88,7 @@ impl QueryBuilder {
             update_clause: UpdateClause::default(),
             where_clause: WhereClause::default(),
             select_clause: SelectClause::from_values(values),
+            limit_clause: Default::default(),
         }
     }
 
@@ -141,9 +146,23 @@ impl QueryBuilder {
         self
     }
 
+    pub fn limit(&mut self, limit: i32) -> &mut Self {
+        self.limit_clause.limit = Some(limit);
+
+        self
+    }
+
+    pub fn offset(&mut self, offset: i32) -> &mut Self {
+        self.limit_clause.offset = Some(offset);
+
+        self
+    }
+
     pub fn exec(&self, client_manager: &mut ClientManager) -> Result<QueryResult> {
         let client = client_manager.get_client(&self.dialect).unwrap();
         let query = self.to_sql().unwrap();
+
+        println!("Compiled query: {}", query);
 
         client.query(query.as_str())
     }

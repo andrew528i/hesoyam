@@ -88,4 +88,12 @@ impl Field {
             value: Box::new(value.clone()),
         }
     }
+
+    pub fn in_<T: Any + Clone>(&self, values: Vec<T>) -> Condition {
+        Condition {
+            name: self.name.to_owned(),
+            operator: Operator::In,
+            value: Box::new(values.clone()),
+        }
+    }
 }

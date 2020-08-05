@@ -8,6 +8,10 @@ pub(in crate) fn gen_model_code(ctx: &ModelContext) -> TokenStream2 {
     let table_name = &ctx.table_name;
     let field_name = &ctx.field_name;
     let field_type = &ctx.field_type;
+    let struct_field_ident = &ctx.struct_field_ident;
+    let struct_field_type = &ctx.struct_field_type;
+
+    let struct_attrs = &ctx.struct_attrs;
 
     let model_ident = struct_ident.to_string();
     let model_ident = format!("Model{}", model_ident);
@@ -15,6 +19,14 @@ pub(in crate) fn gen_model_code(ctx: &ModelContext) -> TokenStream2 {
 
     quote! {
         use hesoyam::Model as #model_ident;
+
+        #(#struct_attrs)*
+        pub struct #struct_ident {
+            pub id: Option<i64>,
+            #(
+                pub #struct_field_ident: #struct_field_type,
+            )*
+        }
 
         impl #model_ident for #struct_ident {
             fn table_name() -> String { String::from(#table_name) }

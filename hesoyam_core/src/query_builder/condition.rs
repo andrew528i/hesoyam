@@ -10,6 +10,7 @@ pub enum Operator {
     Like,
     Is,
     IsNot,
+    In,
 }
 
 pub struct Condition {
