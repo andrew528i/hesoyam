@@ -1,4 +1,7 @@
-use crate::{ClickhouseDialect, Condition, DeleteClause, Field, InsertClause, InsertValue, LimitClause, PostgresDialect, Selectable, SelectClause, SetValue, UpdateClause, WhereClause};
+use std::any::Any;
+use std::time::Instant;
+
+use crate::{ClickhouseDialect, Condition, DeleteClause, Field, InsertClause, InsertValue, LimitClause, PostgresDialect, Selectable, SelectClause, UpdateClause, WhereClause};
 use crate::client::{ClientManager, QueryResult};
 use crate::error::*;
 
@@ -137,10 +140,12 @@ impl QueryBuilder {
         self
     }
 
-    pub fn set(&mut self, values: SetValue) -> &mut Self {
+    pub fn set<T: Any + Clone>(&mut self, field: Field, value: &T) -> &mut Self {
         match &self.query_type {
             QueryType::Update => {
-                self.update_clause.values = values;
+                self.update_clause.values.insert(field, Box::new(value.clone()));
+
+                // self.update_clause.values = values;
             },
             _ => unimplemented!(),
         };
@@ -163,9 +168,12 @@ impl QueryBuilder {
     pub fn exec(&self, client_manager: &mut ClientManager) -> Result<QueryResult> {
         let client = client_manager.get_client(&self.dialect).unwrap();
         let query = self.to_sql().unwrap();
+        let now = Instant::now();
 
-        println!("Compiled query: {}", query);
+        let result = client.query(query.as_str());
 
-        client.query(query.as_str())
+        println!("Compiled query({}, {}ms): {}", self.dialect, now.elapsed().as_millis(), query);
+
+        result
     }
 }

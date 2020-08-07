@@ -32,14 +32,10 @@ pub fn execute() -> Result<()> {
     println!("delete query: {}", res);
 
     // update
-    let mut update_set: HashMap<Field, Box<dyn Any>> = HashMap::new();
-
-    update_set.insert(User::field_name, Box::new(String::from("Tom")));
-
     let res = User::update(vec![
         User::field_name.eq(&"John".to_owned()),
         User::field_age.gt(&20),
-    ]).set(update_set).to_sql().unwrap();
+    ]).set(User::field_name, &"Tom".to_owned()).to_sql().unwrap();
 
     println!("update query: {}", res);
 

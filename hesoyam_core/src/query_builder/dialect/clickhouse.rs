@@ -63,7 +63,7 @@ impl<'a> ClickhouseDialect<'a> {
         let mut str_value: Option<String> = None;
 
         if let Some(v) = value.downcast_ref::<String>() {
-            str_value = Some(format!("'{}'", v));
+            str_value = Some(format!("'{}'", v.replace("'", "''")));
         }
 
         if let Some(v) = value.downcast_ref::<Field>() {
@@ -71,6 +71,10 @@ impl<'a> ClickhouseDialect<'a> {
         }
 
         if let Some(v) = value.downcast_ref::<i32>() {
+            str_value = Some(format!("{}", v));
+        }
+
+        if let Some(v) = value.downcast_ref::<i64>() {
             str_value = Some(format!("{}", v));
         }
 
@@ -90,9 +94,13 @@ impl<'a> ClickhouseDialect<'a> {
             str_value = Some(format!("{}", v));
         }
 
+        if let Some(v) = value.downcast_ref::<DateTime<Utc>>() {
+            str_value = Some(format!("'{}'", v.format("%Y-%m-%d %H:%M:%S").to_string()))
+        }
+
         if let Some(v) = value.downcast_ref::<Vec<String>>() {
             let values = v.iter().
-                map(|s| format!("'{}'", s)).
+                map(|s| format!("'{}'", s.replace("'", "''"))).
                 collect::<Vec<String>>().
                 join(",");
             str_value = Some(format!("({})", values));
@@ -100,7 +108,7 @@ impl<'a> ClickhouseDialect<'a> {
 
         if let Some(&v) = value.downcast_ref::<&[&str]>() {
             let values = v.iter().
-                map(|s| format!("'{}'", s)).
+                map(|s| format!("'{}'", s.replace("'", "''"))).
                 collect::<Vec<String>>().
                 join(",");
             str_value = Some(format!("({})", values));

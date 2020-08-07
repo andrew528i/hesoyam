@@ -11,7 +11,7 @@ Just another one ORM for for Postgres and Clickhouse. If you found it useful ple
 `Cargo.toml`:
 ```toml
 [dependencies]
-hesoyam = "0.1.5"
+hesoyam = "0.1.6"
 ```
 
 # Examples

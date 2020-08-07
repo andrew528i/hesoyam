@@ -75,8 +75,23 @@ impl<'a> PostgresDialect<'a> {
             str_value = Some(format!("{}", v));
         }
 
+        if let Some(v) = value.downcast_ref::<i64>() {
+            str_value = Some(format!("{}", v));
+        }
+
         if let Some(v) = value.downcast_ref::<u32>() {
             str_value = Some(format!("{}", v));
+        }
+
+        if let Some(v) = value.downcast_ref::<bool>() {
+            str_value = Some(match v {
+                true => "TRUE".to_owned(),
+                false => "FALSE".to_owned(),
+            });
+        }
+
+        if let Some(v) = value.downcast_ref::<DateTime<Utc>>() {
+            str_value = Some(format!("'{}'", v.format("%Y-%m-%d %H:%M:%S %:z").to_string()))
         }
 
         if let Some(v) = value.downcast_ref::<Vec<String>>() {
