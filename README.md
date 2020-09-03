@@ -16,7 +16,7 @@ hesoyam = "0.1.6"
 
 # Examples
 
-Let's custom model at first.
+Let's create custom model at first.
 If we won't pass table_name as macro argument default will be generated.
 It assumed that tables already created in db.
 
